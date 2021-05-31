@@ -1,0 +1,73 @@
+criterion:
+  name: ce
+
+optimizer:
+  name: adamw
+  lr: 0.1
+  weight_decay: 0.01
+
+scheduler:
+  name: exp
+  lr_gamma: 0.99
+  lr_min: 0.0245
+
+run:
+  experiment: "cifar100_vgg8_pm"
+  cali_n_epochs: 400
+  map_n_epochs: 300
+  batch_size: 32
+  use_cuda: 1
+  gpu_id: 0
+  deterministic: 1
+  log_interval: 200
+  train_noise: 0
+
+quantize:
+  weight_bit: 8
+  input_bit: 32
+
+noise:
+  phase_bias: 1
+  phase_noise_std: 0
+  gamma_noise_std: 0.002
+  crosstalk_factor: 0.005
+  random_state: 42
+
+ic: # identity calibration
+  alg: zcd # [zgd, ztp, zcd]
+  adaptive: 0
+  best_record: 1
+
+pm:
+  alg: zcd
+  adaptive: 0
+  best_record: 1
+  ideal_I: 1
+
+sparse:
+  bp_forward_weight_sparsity: 0
+  bp_feedback_weight_sparsity: 0
+  bp_input_sparsity: 0
+  bp_spatial_sparsity: 0
+  bp_column_sparsity: 0
+  bp_rank: 9
+
+regularization:
+  lambda_1 : 0
+  lambda_2 : 0
+  lambda_3 : 0
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "cifar100/vgg8/pm"
+  model_comment: ""
+  resume: 1
+  restore_checkpoint: "./checkpoint/cifar10/vgg8/pretrain/SparseBP_MZI_VGG8_wb-32_ib-32__acc-90.66_epoch-185.pt"
+
+model:
+  name: "SparseBP_MZI_VGG8"
+  mode: "weight"
+
+debug:
+  verboise: 1
+

@@ -1,0 +1,69 @@
+criterion:
+  name: ce
+
+optimizer:
+  name: flops
+  lr: 2
+  weight_decay: 0.0
+  sigma: 0.1
+  n_sample: 1
+
+scheduler:
+  name: exp
+  lr_gamma: 0.99
+  lr_min: 0.0245
+
+run:
+  experiment: "default"
+  n_epochs: 50
+  batch_size: 32
+
+quantize:
+  weight_bit: 32
+  input_bit: 32
+  v_pi: 4.36
+  v_max: 10.8
+
+noise:
+  phase_noise_std: 0
+  gamma_noise_std: 0
+  crosstalk_factor: 0
+  random_state: 42
+
+ic: # identity calibration
+  alg: zcd # [zgd, ztp, zcd]
+  adaptive: 1
+  best_record: 1
+
+sparse:
+  bp_forward_weight_sparsity: 0
+  bp_feedback_weight_sparsity: 0
+  bp_feedback_alg: "topk"
+  bp_feedback_norm: "none"
+  bp_input_sparsity: 0
+  bp_spatial_sparsity: 0
+  bp_column_sparsity: 0
+  bp_input_norm: "none"
+  bp_rank: 9
+  bp_rank_alg: "topk"
+  bp_rank_sign: 0
+
+regularization:
+  lambda_1 : 0
+  lambda_2 : 0
+  lambda_3 : 0
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "mnist/cnn3/mixedtrain"
+  model_comment: ""
+  resume: 0
+  restore_checkpoint: ""
+
+model:
+  name: "SparseBP_MZI_CNN"
+  mode: "usv"
+
+debug:
+  verbose: 1
+

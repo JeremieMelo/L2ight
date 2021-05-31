@@ -1,0 +1,99 @@
+dataset:
+  name: fashionmnist
+  root: "./data"
+  num_workers: 2
+  img_height: 28
+  img_width: 28
+  in_channel: 1
+  n_class: 10
+  transform: basic
+
+criterion:
+  name: ce
+
+optimizer:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.0
+
+scheduler:
+  name: cosine
+  lr_gamma: 0.99
+  lr_min: 0
+
+run:
+  experiment: "default"
+  run_id: "default"
+  n_epochs: 200
+  batch_size: 32
+  use_cuda: 1
+  gpu_id: 0
+  deterministic: 1
+  log_interval: 200
+  train_noise: 0
+
+quantize:
+  weight_bit: 32
+  input_bit: 32
+  v_pi: 4.36
+  v_max: 10.8
+
+noise:
+  phase_bias: 0
+  phase_noise_std: 0
+  gamma_noise_std: 0
+  crosstalk_factor: 0
+  random_state: 42
+
+ic: # identity calibration
+  alg: zcd # [zgd, ztp, zcd]
+  adaptive: 1
+  best_record: 1
+
+kd: 0 # knowledge distillation
+
+sparse:
+  bp_data_sparsity: 0
+  bp_data_alg: smb # smd: sto. mini-batch drop; smb: standard mini-batch; is: importance sampling
+  bp_forward_weight_sparsity: 0
+  bp_feedback_weight_sparsity: 0
+  bp_feedback_alg: "topk"
+  bp_feedback_norm: "none"
+  bp_input_sparsity: 0
+  bp_spatial_sparsity: 0
+  bp_column_sparsity: 0
+  bp_input_norm: "none"
+  bp_rank: 8
+  bp_rank_alg: "topk"
+  bp_rank_sign: 0
+
+regularization:
+  lambda_1 : 0
+  lambda_2 : 0
+  lambda_3 : 0
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "mnist/cnn2/pretrain"
+  model_comment: ""
+  resume: 0
+  restore_checkpoint: ""
+  restore_checkpoint_pretrained: ""
+
+model:
+  name: "SparseBP_MZI_CNN"
+  mode: "usv"
+  kernel_list: [64, 64, 64]
+  kernel_size_list: [3, 3, 3]
+  hidden_list: []
+  block_list: [8,8,8,8]
+  stride_list: [1, 1, 1]
+  padding_list: [1, 1, 1]
+  pool_out_size: 5
+  act: relu
+  act_thres: 4
+  norm: bn
+
+debug:
+  verbose: 1
+

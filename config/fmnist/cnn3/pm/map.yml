@@ -1,0 +1,52 @@
+criterion:
+  name: ce
+
+optimizer:
+  name: adamw
+  lr: 0.1
+  weight_decay: 0.01
+
+scheduler:
+  name: exp
+  lr_gamma: 0.99
+  lr_min: 0.0245
+
+run:
+  experiment: "fmnist_cnn2_pm"
+  cali_n_epochs: 400
+  map_n_epochs: 540
+  batch_size: 32
+
+quantize:
+  weight_bit: 8
+
+noise:
+  phase_bias: 1
+  gamma_noise_std: 0.002
+  crosstalk_factor: 0.005
+  random_state: 42
+
+ic: # identity calibration
+  alg: zcd # [zgd, ztp, zcd]
+  adaptive: 0
+  best_record: 1
+
+pm: # parallel mapping
+  alg: zcd # [zgd, ztp, zcd]
+  adaptive: 0
+  best_record: 1
+  ideal_I: 1
+
+checkpoint:
+  checkpoint_dir: "fmnist/cnn2/pm"
+  model_comment: ""
+  resume: 1
+  restore_checkpoint: ./checkpoint/fmnist/cnn2/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-93.02_epoch-95.pt
+
+model:
+  name: "SparseBP_MZI_CNN"
+  mode: "weight"
+
+debug:
+  verbose: 1
+

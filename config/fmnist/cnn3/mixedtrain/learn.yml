@@ -1,0 +1,63 @@
+criterion:
+  name: ce
+
+optimizer:
+  name: mixedtrain
+  lr: 0.0245
+  weight_decay: 0
+  param_sparsity: 0.6
+  grad_sparsity: 0.9
+
+scheduler:
+  name: exp
+  lr_gamma: 0.99
+  lr_min: 0.0245
+
+run:
+  experiment: "fmnist_cnn3_learn_mixedtrain" # feedback sampling
+  n_epochs: 100
+  batch_size: 32
+  log_interval: 20
+
+quantize:
+  weight_bit: 8
+
+noise:
+  phase_bias: 1
+  gamma_noise_std: 0.002
+  crosstalk_factor: 0.005
+  random_state: 42
+
+sl: # subspace learning
+  noisy_identity: 0
+
+sparse:
+  bp_forward_weight_sparsity: 0
+  bp_feedback_weight_sparsity: 0
+  bp_feedback_alg: "topk"
+  bp_feedback_norm: "none"
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "fmnist/cnn3/mixedtrain"
+  model_comment: ""
+  resume: 0
+  restore_checkpoint: ./checkpoint/fmnist/cnn/map/SparseBP_MZI_CNN_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1__acc-90.10_epoch-540.pt
+  restore_checkpoint_pretrained: "" #"./checkpoint/fmnist/cnn/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-92.66_epoch-79.pt"
+model:
+  name: "SparseBP_MZI_CNN"
+  mode: "usv"
+  kernel_list: [8, 8, 8]
+  kernel_size_list: [3, 3, 3]
+  hidden_list: []
+  block_list: [9,9,9,8]
+  stride_list: [2, 2, 2]
+  padding_list: [1, 1, 1]
+  pool_out_size: 5
+  act: relu
+  act_thres: 4
+  norm: bn
+
+debug:
+  verbose: 1
+

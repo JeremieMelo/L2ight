@@ -1,0 +1,49 @@
+criterion:
+  name: ce
+
+optimizer:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+
+scheduler:
+  name: cosine
+  lr_gamma: 0.99
+  lr_min: 0
+
+run:
+  experiment: "cifar10_vgg8_learn_ds" # data sampling
+  n_epochs: 200
+  batch_size: 32
+
+quantize:
+  weight_bit: 8
+
+noise:
+  phase_bias: 1
+  phase_noise_std: 0
+  gamma_noise_std: 0.002
+  crosstalk_factor: 0.005
+  random_state: 42
+
+sl: # subspace learning
+  noisy_identity: 0
+
+sparse:
+  bp_data_sparsity: 0
+  bp_data_alg: smb # smd: sto. mini-batch drop; smb: standard mini-batch; is: importance sampling
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "cifar10/vgg8/learn_ds"
+  model_comment: ""
+  resume: 0
+  restore_checkpoint: ./checkpoint/fmnist/cnn/map/SparseBP_MZI_CNN_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1__acc-90.10_epoch-540.pt
+  restore_checkpoint_pretrained: "" #"./checkpoint/fmnist/cnn/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-92.66_epoch-79.pt"
+model:
+  name: "SparseBP_MZI_VGG8"
+  mode: "usv"
+
+debug:
+  verbose: 1
+

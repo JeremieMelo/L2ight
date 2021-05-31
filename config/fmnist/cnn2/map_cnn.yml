@@ -1,0 +1,83 @@
+dataset:
+  name: fashionmnist
+  root: "./data"
+  num_workers: 2
+  img_height: 28
+  img_width: 28
+  in_channel: 1
+  n_class: 10
+  transform: basic
+
+criterion:
+  name: ce
+
+optimizer:
+  name: adamw
+  lr: 0.1
+  weight_decay: 0.01
+
+scheduler:
+  name: exp
+  lr_gamma: 0.99
+  lr_min: 0.0245
+
+run:
+  experiment: "fmnist_cnn2_map"
+  cali_n_epochs: 1
+  map_n_epochs: 540
+  batch_size: 32
+  use_cuda: 1
+  gpu_id: 0
+  deterministic: 1
+  log_interval: 200
+  train_noise: 0
+
+quantize:
+  weight_bit: 8
+  input_bit: 32
+
+noise:
+  phase_noise_std: 0
+  gamma_noise_std: 0.002
+  crosstalk_factor: 0.005
+  random_state: 42
+
+ic: # identity calibration
+  alg: zcd # [zgd, ztp, zcd]
+  adaptive: 0
+  best_record: 1
+
+pm: # parallel mapping
+  alg: zgd # [zgd, ztp, zcd]
+  adaptive: 0
+  best_record: 0
+  ideal_I: 1
+
+sparse:
+  bp_forward_weight_sparsity: 0
+  bp_feedback_weight_sparsity: 0
+  bp_input_sparsity: 0
+  bp_spatial_sparsity: 0
+  bp_column_sparsity: 0
+  bp_rank: 8
+
+regularization:
+  lambda_1 : 0
+  lambda_2 : 0
+  lambda_3 : 0
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "fmnist/cnn2/map"
+  model_comment: ""
+  resume: 1
+  restore_checkpoint: "./checkpoint/fmnist/cnn/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-92.66_epoch-79.pt"
+
+model:
+  name: "SparseBP_MZI_CNN"
+  mode: "weight"
+
+
+debug:
+  verboise: 1
+

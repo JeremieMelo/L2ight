@@ -1,0 +1,70 @@
+criterion:
+  name: ce
+
+optimizer:
+  name: adamw
+  lr: 0.1
+  weight_decay: 0
+
+scheduler:
+  name: cosine
+  lr_gamma: 0.99
+  lr_min: 0.0245
+
+run:
+  experiment: "default"
+  n_epochs: 200
+  batch_size: 32
+  use_cuda: 1
+  gpu_id: 0
+  deterministic: 1
+  log_interval: 200
+  train_noise: 0
+
+quantize:
+  weight_bit: 32
+  input_bit: 32
+  v_pi: 4.36
+  v_max: 10.8
+
+noise:
+  phase_bias: 0
+  phase_noise_std: 0
+  gamma_noise_std: 0
+  crosstalk_factor: 0
+  random_state: 42
+
+ic: # identity calibration
+  alg: zcd # [zgd, ztp, zcd]
+  adaptive: 1
+  best_record: 1
+
+sparse:
+  bp_data_sparsity: 0
+  bp_data_alg: smb # smd: sto. mini-batch drop; smb: standard mini-batch; is: importance sampling
+  bp_forward_weight_sparsity: 0
+  bp_feedback_weight_sparsity: 0
+  bp_feedback_alg: "topk"
+  bp_feedback_norm: "none"
+  bp_input_sparsity: 0
+  bp_spatial_sparsity: 0
+  bp_column_sparsity: 0
+  bp_input_norm: "none"
+  bp_rank: 9
+  bp_rank_alg: "topk"
+  bp_rank_sign: 0
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "cifar10/vgg8/pretrain"
+  model_comment: ""
+  resume: 0
+  restore_checkpoint: ""
+
+model:
+  name: "SparseBP_MZI_VGG8"
+  mode: "weight"
+
+debug:
+  verbose: 1
+

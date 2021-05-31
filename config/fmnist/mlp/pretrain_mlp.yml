@@ -1,0 +1,79 @@
+dataset:
+  name: mnist
+  root: "./data"
+  num_workers: 2
+  img_height: 28
+  img_width: 28
+  in_channel: 1
+  n_class: 10
+  transform: basic
+
+criterion:
+  name: ce
+
+optimizer:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+
+scheduler:
+  name: cosine
+  lr_min: 0.00002
+
+run:
+  experiment: "mnist_mlp_pretrain"
+  n_epochs: 200
+  batch_size: 32
+  use_cuda: 1
+  gpu_id: 0
+  deterministic: 1
+  log_interval: 200
+  train_noise: 0
+
+quantize:
+  weight_bit: 32
+  input_bit: 32
+
+noise:
+  phase_noise_std: 0
+  gamma_noise_std: 0
+  crosstalk_factor: 0
+  random_state: 42
+
+sparse:
+  bp_forward_weight_sparsity: 0
+  bp_feedback_weight_sparsity: 0
+  bp_input_sparsity: 0
+  bp_spatial_sparsity: 0
+  bp_column_sparsity: 0
+  bp_rank: 8
+
+regularization:
+  lambda_1 : 0
+  lambda_2 : 0
+  lambda_3 : 0
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "mnist/mlp/pretrain"
+  model_comment: ""
+  resume: 0
+  restore_checkpoint: ""
+
+model:
+  name: "SparseBP_MZI_MLP"
+  mode: "weight"
+  kernel_list: []
+  kernel_size_list: []
+  hidden_list: [64, 64]
+  block_list: [8, 8, 8]
+  stride_list: []
+  padding_list: []
+  pool_out_size: 5
+  act: relu
+  act_thres: 4
+  norm: bn
+
+debug:
+  verbose: 1
+

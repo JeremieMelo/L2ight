@@ -1,0 +1,54 @@
+criterion:
+  name: ce
+
+optimizer:
+  name: flops
+  lr: 2
+  weight_decay: 0.0
+  sigma: 0.1
+  n_sample: 1
+
+scheduler:
+  name: exp
+  lr_gamma: 0.99
+  lr_min: 0.0245
+
+run:
+  experiment: "mnist_cnn3_learn_flops" # feedback sampling
+  n_epochs: 50
+  batch_size: 32
+  log_interval: 200
+
+quantize:
+  weight_bit: 8
+
+noise:
+  phase_bias: 1
+  gamma_noise_std: 0.002
+  crosstalk_factor: 0.005
+  random_state: 42
+
+sl: # subspace learning
+  noisy_identity: 0
+
+sparse:
+  bp_forward_weight_sparsity: 0
+  bp_feedback_weight_sparsity: 0
+  bp_feedback_alg: "topk"
+  bp_feedback_norm: "none"
+
+checkpoint:
+  save_best_model_k: 3
+  checkpoint_dir: "mnist/cnn3/flops"
+  model_comment: ""
+  resume: 1
+  restore_checkpoint: ./checkpoint/mnist/cnn3/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-97.96_epoch-75.pt
+  restore_checkpoint_pretrained: ""
+
+model:
+  name: "SparseBP_MZI_CNN"
+  mode: "usv"
+
+debug:
+  verbose: 1
+
