@@ -39,7 +39,7 @@ checkpoint:
   checkpoint_dir: "cifar10/resnet18/fbs"
   model_comment: ""
   resume: 0
-  restore_checkpoint: "./checkpoint/cifar10/vgg/pretrain/SparseBP_MZI_VGG8_wb-32_ib-32_bprank-8_bpfb-0_bpin-0__acc-90.97_epoch-188.pt"
+  restore_checkpoint : ""
   restore_checkpoint_pretrained: "" #"./checkpoint/fmnist/cnn/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-92.66_epoch-79.pt"
 
 model:

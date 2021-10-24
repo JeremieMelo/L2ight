@@ -4,7 +4,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/mnist/cnn3/mixedtrain"
 script = 'train_zo_learn.py'
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
 
-    tasks = [(0.85, 0.9)] # 14590  01:42 AM 04/27
+    tasks = [(0.85, 0.9)] #
     with Pool(1) as p:
         p.map(task_launcher, tasks)
     logger.info(f"Exp: {configs.run.experiment} Done.")

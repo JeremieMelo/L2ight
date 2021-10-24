@@ -5,7 +5,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/svhn/vgg8/ds"
 script = 'train_learn.py'
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
     # fbs, ss, cs, first, input_norm, ds, id, acc, checkpoint
-    tasks = [[0.6, 0, 0.6, 0, "none", 0.5, 1, 92.57, "./checkpoint/svhn/vgg8/pm/SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1_ic-400_acc-92.57_epoch-300.pt"]] # 9052 03:59 PM 05/06
+    tasks = [[0.6, 0, 0.6, 0, "none", 0.5, 1, 92.57, "./checkpoint/svhn/vgg8/pm/SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1_ic-400_acc-92.57_epoch-300.pt"]] #
 
     with Pool(1) as p:
         p.map(task_launcher, tasks)

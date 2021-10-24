@@ -38,7 +38,7 @@ checkpoint:
   checkpoint_dir: "fmnist/cnn2/ic"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/fmnist/cnn2/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-92.56_epoch-160.pt"
+  restore_checkpoint : ""
 
 model:
   mode: "weight"

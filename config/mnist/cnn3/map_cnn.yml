@@ -71,7 +71,7 @@ checkpoint:
   checkpoint_dir: "fmnist/cnn2/map"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/fmnist/cnn/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-92.66_epoch-79.pt"
+  restore_checkpoint : ""
 
 model:
   name: "SparseBP_MZI_CNN"

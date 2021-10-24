@@ -5,7 +5,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/resnet18/pm"
 script = 'train_map.py'

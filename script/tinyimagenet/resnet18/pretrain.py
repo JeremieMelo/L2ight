@@ -4,7 +4,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/tinyimagenet/resnet18/pretrain"
 script = 'train_pretrain.py'
@@ -32,7 +32,7 @@ def task_launcher(args):
 if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
-    tasks = [("tinyimagenet", 200)] # 3536  04:37 AM 05/07
+    tasks = [("tinyimagenet", 200)] #
 
     with Pool(1) as p:
         p.map(task_launcher, tasks)

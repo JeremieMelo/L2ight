@@ -64,7 +64,7 @@ checkpoint:
   checkpoint_dir: "mnist/cnn/learn"
   model_comment: ""
   resume: 0
-  restore_checkpoint: "./checkpoint/mnist/cnn/map/SparseBP_MZI_CNN_wb-8_ib-32_bprank-8_bpfb-0_bpin-0__acc-98.48_epoch-0.pt"
+  restore_checkpoint : ""
 
 model:
   name: "SparseBP_MZI_CNN"

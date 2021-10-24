@@ -5,7 +5,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/vgg8/cs"
 script = 'train_learn.py'
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
 
-    args = [[0.6, 0, 0.6, 0, "none", 0.5]] # 1684  02:23 AM 4/26 w/o ss, first conv=0, exp norm
+    args = [[0.6, 0, 0.6, 0, "none", 0.5]] # w/o ss, first conv=0, exp norm
     checkpoints = [[acc,os.path.join("./checkpoint/cifar10/vgg8/pm", i)] for acc, i in [
         [59.62, "SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1__acc-59.62_epoch-20.pt"],
         [66.23,"SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1__acc-66.23_epoch-40.pt"],
@@ -53,8 +53,8 @@ if __name__ == '__main__':
         [85.19,"SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1__acc-85.19_epoch-150.pt"],
         [89.13,"SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1__acc-89.13_epoch-300.pt"]
         ]]
-    ### 3712  02:49 AM 04/27 DONE
-    ### 15727  04:35 AM 04/27
+    # DONE
+    #
     tasks = [args[0]+i for i in checkpoints]
     with Pool(1) as p:
         p.map(task_launcher, tasks[3:4])

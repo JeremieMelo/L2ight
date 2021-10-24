@@ -1,35 +1,91 @@
+"""
+Description:
+Author: Jiaqi Gu (jqgu@utexas.edu)
+Date: 2021-10-24 16:25:28
+LastEditors: Jiaqi Gu (jqgu@utexas.edu)
+LastEditTime: 2021-10-24 16:25:28
+"""
 
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 import torch.nn.functional as F
+from pyutils.general import logger
 from torch import Tensor, nn
 from torch.types import Device, _size
-from torchpack.utils.logging import logger
 
 from .layers.activation import ReLUN
 from .layers.custom_conv2d import MZIBlockConv2d
 from .layers.custom_linear import MZIBlockLinear
 from .sparse_bp_base import SparseBP_Base
 
-__all__ = ["SparseBP_MZI_VGG8", "SparseBP_MZI_VGG11",
-           "SparseBP_MZI_VGG13", "SparseBP_MZI_VGG16", "SparseBP_MZI_VGG19"]
+__all__ = [
+    "SparseBP_MZI_VGG8",
+    "SparseBP_MZI_VGG11",
+    "SparseBP_MZI_VGG13",
+    "SparseBP_MZI_VGG16",
+    "SparseBP_MZI_VGG19",
+]
 
 cfg_32 = {
-    'vgg8': [64, 'M', 128, 'M', 256, 'M', 512, 'M', 512, 'M'],
-    'vgg11': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'vgg13': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'vgg16': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-    'vgg19': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
+    "vgg8": [64, "M", 128, "M", 256, "M", 512, "M", 512, "M"],
+    "vgg11": [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
+    "vgg13": [64, 64, "M", 128, 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
+    "vgg16": [64, 64, "M", 128, 128, "M", 256, 256, 256, "M", 512, 512, 512, "M", 512, 512, 512, "M"],
+    "vgg19": [
+        64,
+        64,
+        "M",
+        128,
+        128,
+        "M",
+        256,
+        256,
+        256,
+        256,
+        "M",
+        512,
+        512,
+        512,
+        512,
+        "M",
+        512,
+        512,
+        512,
+        512,
+        "M",
+    ],
 }
 
 cfg_64 = {
-    'vgg8': [64, 'M', 128, 'M', 256, 'M', 512, 'M', 512, 'GAP'],
-    'vgg11': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'GAP'],
-    'vgg13': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'GAP'],
-    'vgg16': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'GAP'],
-    'vgg19': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'GAP'],
+    "vgg8": [64, "M", 128, "M", 256, "M", 512, "M", 512, "GAP"],
+    "vgg11": [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "GAP"],
+    "vgg13": [64, 64, "M", 128, 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "GAP"],
+    "vgg16": [64, 64, "M", 128, 128, "M", 256, 256, 256, "M", 512, 512, 512, "M", 512, 512, 512, "GAP"],
+    "vgg19": [
+        64,
+        64,
+        "M",
+        128,
+        128,
+        "M",
+        256,
+        256,
+        256,
+        256,
+        "M",
+        512,
+        512,
+        512,
+        512,
+        "M",
+        512,
+        512,
+        512,
+        512,
+        "GAP",
+    ],
 }
 
 
@@ -50,7 +106,7 @@ class ConvBlock(nn.Module):
         in_bit: int = 16,
         photodetect: bool = False,
         act_thres: int = 6,
-        device: Device = torch.device("cuda")
+        device: Device = torch.device("cuda"),
     ) -> None:
         super().__init__()
         self.conv = MZIBlockConv2d(
@@ -67,12 +123,12 @@ class ConvBlock(nn.Module):
             w_bit=w_bit,
             in_bit=in_bit,
             photodetect=photodetect,
-            device=device)
+            device=device,
+        )
 
         self.bn = nn.BatchNorm2d(out_channel)
 
         self.activation = ReLUN(act_thres, inplace=True) if act_thres <= 6 else nn.ReLU(inplace=True)
-
 
     def forward(self, x: Tensor) -> Tensor:
         return self.activation(self.bn(self.conv(x)))
@@ -93,53 +149,47 @@ class LinearBlock(nn.Module):
         photodetect: bool = False,
         activation: bool = True,
         act_thres: int = 6,
-        device: Device = torch.device("cuda")
+        device: Device = torch.device("cuda"),
     ) -> None:
         super().__init__()
         self.linear = MZIBlockLinear(
-            in_channel,
-            out_channel,
-            miniblock,
-            bias,
-            mode,
-            v_max,
-            v_pi,
-            w_bit,
-            in_bit,
-            photodetect,
-            device)
+            in_channel, out_channel, miniblock, bias, mode, v_max, v_pi, w_bit, in_bit, photodetect, device
+        )
 
-        self.activation = (ReLUN(
-            act_thres, inplace=True) if act_thres <= 6 else nn.ReLU(inplace=True)) if activation else None
+        self.activation = (
+            (ReLUN(act_thres, inplace=True) if act_thres <= 6 else nn.ReLU(inplace=True))
+            if activation
+            else None
+        )
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.linear(x)
-        if(self.activation is not None):
+        if self.activation is not None:
             x = self.activation(x)
         return x
 
 
 class VGG(SparseBP_Base):
-    '''MZI VGG (Shen+, Nature Photonics 2017). Support sparse backpropagation. Blocking matrix multiplication.
-    '''
+    """MZI VGG (Shen+, Nature Photonics 2017). Support sparse backpropagation. Blocking matrix multiplication."""
 
-    def __init__(self,
-                 vgg_name: str,
-                 img_height: int,
-                 img_width: int,
-                 in_channel: int,
-                 n_class: int,
-                 block_list: List[int] = [8],
-                 in_bit: int = 32,
-                 w_bit: int = 32,
-                 mode: str = "usv",
-                 v_max: float = 10.8,
-                 v_pi: float = 4.36,
-                 act_thres: float = 6.0,
-                 photodetect: bool = True,
-                 bias: bool = False,
-                 device: Device = torch.device("cuda")
-                 ) -> None:
+    def __init__(
+        self,
+        vgg_name: str,
+        img_height: int,
+        img_width: int,
+        in_channel: int,
+        n_class: int,
+        block_list: List[int] = [8],
+        in_bit: int = 32,
+        w_bit: int = 32,
+        mode: str = "usv",
+        v_max: float = 10.8,
+        v_pi: float = 4.36,
+        act_thres: float = 6.0,
+        photodetect: bool = True,
+        bias: bool = False,
+        device: Device = torch.device("cuda"),
+    ) -> None:
         super().__init__()
 
         self.vgg_name = vgg_name
@@ -174,11 +224,12 @@ class VGG(SparseBP_Base):
         self.features, convNum = self._make_layers(cfg[self.vgg_name])
         # build FC layers
         ## lienar layer use the last miniblock
-        if(self.img_height == 64 and self.vgg_name == "vgg8"): ## model is too small, do not use dropout
+        if self.img_height == 64 and self.vgg_name == "vgg8":  ## model is too small, do not use dropout
             classifier = []
         else:
             classifier = [nn.Dropout(0.5)]
-        classifier += [MZIBlockLinear(
+        classifier += [
+            MZIBlockLinear(
                 512,
                 self.n_class,
                 miniblock=self.block_list[-1],
@@ -189,8 +240,9 @@ class VGG(SparseBP_Base):
                 in_bit=self.in_bit,
                 w_bit=self.w_bit,
                 photodetect=self.photodetect,
-                device=self.device
-            )]
+                device=self.device,
+            )
+        ]
         self.classifier = nn.Sequential(*classifier)
 
     def _make_layers(self, cfg):
@@ -200,32 +252,35 @@ class VGG(SparseBP_Base):
 
         for x in cfg:
             # MaxPool2d
-            if x == 'M':
+            if x == "M":
                 layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
             elif x == "GAP":
                 layers += [nn.AdaptiveAvgPool2d((1, 1))]
             else:
                 # conv + BN + RELU
-                layers += [ConvBlock(
-                    in_channel,
-                    x,
-                    kernel_size=3,
-                    miniblock=self.block_list[0], ## miniblock will not change, conv layer use the first miniblock
-                    bias=self.bias,
-                    stride=1,
-                    padding=1,
-                    mode=self.mode,
-                    v_max=self.v_max,
-                    v_pi=self.v_pi,
-                    w_bit=self.w_bit,
-                    in_bit=self.in_bit,
-                    photodetect=self.photodetect,
-                    act_thres=self.act_thres,
-                    device=self.device
-                )]
+                layers += [
+                    ConvBlock(
+                        in_channel,
+                        x,
+                        kernel_size=3,
+                        miniblock=self.block_list[
+                            0
+                        ],  ## miniblock will not change, conv layer use the first miniblock
+                        bias=self.bias,
+                        stride=1,
+                        padding=1,
+                        mode=self.mode,
+                        v_max=self.v_max,
+                        v_pi=self.v_pi,
+                        w_bit=self.w_bit,
+                        in_bit=self.in_bit,
+                        photodetect=self.photodetect,
+                        act_thres=self.act_thres,
+                        device=self.device,
+                    )
+                ]
                 in_channel = x
                 convNum += 1
-        # layers += [nn.AdaptiveAvgPool2d(1)] #[nn.AvgPool2d(kernel_size=1, stride=1)]
         return nn.Sequential(*layers), convNum
 
     def forward(self, x: Tensor) -> Tensor:
@@ -264,14 +319,15 @@ def test():
         3,
         10,
         [4, 4, 4, 4, 4, 4, 4, 4],
-        32, 32,
-        mode='usv',
+        32,
+        32,
+        mode="usv",
         v_max=10.8,
         v_pi=4.36,
         act_thres=6.0,
         photodetect=True,
         bias=False,
-        device=device
+        device=device,
     ).to(device)
 
     x = torch.randn(2, 3, 32, 32).to(device)

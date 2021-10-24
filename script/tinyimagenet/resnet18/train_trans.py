@@ -4,7 +4,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/tinyimagenet/resnet18/trans"
 script = 'train_learn.py'
@@ -47,15 +47,15 @@ def task_launcher(args):
 if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
-    # tasks = [("cifar10", 10, 32, 32, 1, 0, 1), #  20746 05:26 PM 05/10
-    #          ("cifar100", 100, 32, 32, 1, 0, 1), #  898 05:25 PM 05/10
-    #          ("dogs", 120, 224, 224, 0, 0, 1), # 4696  01:37 AM 05/11
-    #          ("cars", 196, 224, 224, 0, 0, 1), # 14657  01:37 AM 05/11
+    #
+    #
+    #
+    #
     #          ]
-    tasks = [("cifar10", 10, 32, 32, 1, 0, 2), #  2089 01:39 AM 05/12
-             ("cifar100", 100, 32, 32, 1, 0, 2), #  17544 01:57 AM 05/12
-             ("dogs", 120, 224, 224, 1, 0, 2), # 17582  01:44 AM 05/12
-             ("cars", 196, 224, 224, 1, 0, 2), # 31892  01:45 AM 05/12
+    tasks = [("cifar10", 10, 32, 32, 1, 0, 2), #
+             ("cifar100", 100, 32, 32, 1, 0, 2), #
+             ("dogs", 120, 224, 224, 1, 0, 2), #
+             ("cars", 196, 224, 224, 1, 0, 2), #
              ]
     task1 = tasks[0:1]
     task2 = tasks[1:2]

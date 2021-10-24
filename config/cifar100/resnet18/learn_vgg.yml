@@ -65,8 +65,8 @@ checkpoint:
   checkpoint_dir: "cifar10/vgg/learn"
   model_comment: ""
   resume: 1
-  # restore_checkpoint: "./checkpoint/cifar10/vgg/map/SparseBP_MZI_VGG8_wb-8_ib-32_bprank-8_bpfw-0_bpbw-0_bpin-0__acc-82.61_epoch-0.pt"
-  restore_checkpoint: "./checkpoint/cifar10/vgg/map/SparseBP_MZI_VGG8_wb-8_ib-32_bprank-8_bpfw-0_bpbw-0_bpin-0__acc-87.25_epoch-0.pt"
+  # restore_checkpoint : ""
+  restore_checkpoint : ""
 
 model:
   name: "SparseBP_MZI_VGG8"

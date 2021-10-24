@@ -1,3 +1,10 @@
+'''
+Description:
+Author: Jiaqi Gu (jqgu@utexas.edu)
+Date: 2021-10-24 17:11:26
+LastEditors: Jiaqi Gu (jqgu@utexas.edu)
+LastEditTime: 2021-10-24 17:11:26
+'''
 
 import os
 import subprocess
@@ -5,7 +12,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/vgg8/ds"
 script = 'train_learn.py'
@@ -46,9 +53,9 @@ if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
 
-    args = [[0.6, 0, 0.6, 0, "none", 0.5, 1]] # 1684  02:23 AM 4/26 w/o ss, first conv=0, exp norm
-    args = [[0.6, 0, 0.6, 0, "none", 0.5, 2]] # 23334  05:43 PM 4/30 w/o ss, first conv=0, exp norm
-    args = [[0.6, 0, 0.6, 0, "none", 0.5, 3]] # 23536  05:44 PM 4/30 w/o ss, first conv=0, exp norm
+    args = [[0.6, 0, 0.6, 0, "none", 0.5, 1]] # w/o ss, first conv=0, exp norm
+    args = [[0.6, 0, 0.6, 0, "none", 0.5, 2]] # w/o ss, first conv=0, exp norm
+    args = [[0.6, 0, 0.6, 0, "none", 0.5, 3]] # w/o ss, first conv=0, exp norm
     checkpoints = [[acc,os.path.join("./checkpoint/cifar10/vgg8/pm", i)] for acc, i in [
         [59.62, "SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1_ic-400_acc-59.62_epoch-20.pt"],
         [66.23,"SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1_ic-400_acc-66.23_epoch-40.pt"],
@@ -58,13 +65,10 @@ if __name__ == '__main__':
         [85.02,"SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1_ic-400_acc-85.02_epoch-200.pt"],
         [86.35,"SparseBP_MZI_VGG8_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1_ic-400_acc-86.35_epoch-300.pt"]
         ]]
-    ### 3712  02:49 AM 04/27 DONE
-    ### 15727  04:35 AM 04/27
+    # DONE
+    #
     tasks = [args[0]+i for i in checkpoints]
-    # tasks1 = tasks[:3] # 15043
-    # tasks2 = tasks[3:6] # 28117
-    # tasks3 = tasks[6:] # 22773
-    # tasks4 = tasks[-2:-1] # 29085 ead14
+
     tasks4 = tasks[-1:] # 29085 ead14
     with Pool(1) as p:
         p.map(task_launcher, tasks4)

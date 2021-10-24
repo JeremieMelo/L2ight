@@ -72,7 +72,7 @@ checkpoint:
   checkpoint_dir: "cifar10/vgg8/trans_pm"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/cifar100/vgg8/pretrain/SparseBP_MZI_VGG8_wb-32_ib-32__acc-67.34_epoch-186.pt"
+  restore_checkpoint : ""
   no_linear: 0 ## remove linear layer
 
 model:

@@ -1,3 +1,10 @@
+'''
+Description:
+Author: Jiaqi Gu (jqgu@utexas.edu)
+Date: 2021-10-24 16:45:21
+LastEditors: Jiaqi Gu (jqgu@utexas.edu)
+LastEditTime: 2021-10-24 16:45:21
+'''
 
 import os
 import subprocess
@@ -5,7 +12,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/resnet18/ds"
 script = 'train_learn.py'
@@ -46,13 +53,13 @@ if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
 
-    args = [[0.5, 0, 0.5, 0, "none", 0.5, 1]] # 1684  02:23 AM 4/26 w/o ss, first conv=0, exp norm
-    args = [[0.5, 0, 0.5, 0, "none", 0.5, 2]] # 31531  09:11 PM 4/30 w/o ss, first conv=0, exp norm
+    args = [[0.5, 0, 0.5, 0, "none", 0.5, 1]] #
+    args = [[0.5, 0, 0.5, 0, "none", 0.5, 2]] #
     checkpoints = [[acc,os.path.join("./checkpoint/cifar10/resnet18/pm", i)] for acc, i in [
         [93.40,"SparseBP_MZI_ResNet18_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1_ic-400_acc-93.40_epoch-300.pt"]
         ]]
 
-    tasks = [args[0]+i for i in checkpoints] # 28111  10:48 PM 04/29
+    tasks = [args[0]+i for i in checkpoints] #
 
     with Pool(1) as p:
         p.map(task_launcher, tasks)

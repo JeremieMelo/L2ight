@@ -40,7 +40,7 @@ checkpoint:
   checkpoint_dir: "cifar10/resnet18/trans"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/tinyimagenet/resnet18/pm/SparseBP_MZI_ResNet18_wb-8_ib-32_icalg-zcd_icadapt-0_icbest-1_ic-400_acc-46.31_epoch-300.pt"
+  restore_checkpoint : ""
   restore_checkpoint_pretrained:  "" #"./checkpoint/fmnist/cnn/pretrain/SparseBP_MZI_CNN_wb-32_ib-32__acc-92.66_epoch-79.pt"
   no_linear: 1
 

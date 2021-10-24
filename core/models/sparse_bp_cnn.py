@@ -1,12 +1,19 @@
+'''
+Description:
+Author: Jiaqi Gu (jqgu@utexas.edu)
+Date: 2021-10-24 16:23:50
+LastEditors: Jiaqi Gu (jqgu@utexas.edu)
+LastEditTime: 2021-10-24 16:23:50
+'''
 from collections import OrderedDict
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 import torch.nn.functional as F
+from pyutils.general import logger
 from torch import Tensor, nn
 from torch.types import Device, _size
-from torchpack.utils.logging import logger
 
 from .layers.activation import ReLUN
 from .layers.custom_conv2d import MZIBlockConv2d
@@ -33,7 +40,7 @@ class ConvBlock(nn.Module):
         in_bit: int = 16,
         photodetect: bool = False,
         act_thres: int = 6,
-        device: Device = torch.device("cuda")
+        device: Device = torch.device("cuda"),
     ) -> None:
         super().__init__()
         self.conv = MZIBlockConv2d(
@@ -50,7 +57,8 @@ class ConvBlock(nn.Module):
             w_bit=w_bit,
             in_bit=in_bit,
             photodetect=photodetect,
-            device=device)
+            device=device,
+        )
 
         self.bn = nn.BatchNorm2d(out_channel)
 
@@ -75,58 +83,48 @@ class LinearBlock(nn.Module):
         photodetect: bool = False,
         activation: bool = True,
         act_thres: int = 6,
-        device: Device = torch.device("cuda")
+        device: Device = torch.device("cuda"),
     ) -> None:
         super().__init__()
         self.linear = MZIBlockLinear(
-            in_channel,
-            out_channel,
-            miniblock,
-            bias,
-            mode,
-            v_max,
-            v_pi,
-            w_bit,
-            in_bit,
-            photodetect,
-            device)
+            in_channel, out_channel, miniblock, bias, mode, v_max, v_pi, w_bit, in_bit, photodetect, device
+        )
 
-        self.activation = ReLUN(
-            act_thres, inplace=True) if activation else None
+        self.activation = ReLUN(act_thres, inplace=True) if activation else None
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.linear(x)
-        if(self.activation is not None):
+        if self.activation is not None:
             x = self.activation(x)
         return x
 
 
 class SparseBP_MZI_CNN(SparseBP_Base):
-    '''MZI CNN (Shen+, Nature Photonics 2017). Support sparse backpropagation. Blocking matrix multiplication.
-    '''
+    """MZI CNN (Shen+, Nature Photonics 2017). Support sparse backpropagation. Blocking matrix multiplication."""
 
-    def __init__(self,
-                 img_height: int,
-                 img_width: int,
-                 in_channel: int,
-                 n_class: int,
-                 kernel_list: List[int] = [32],
-                 kernel_size_list: List[int] = [3],
-                 pool_out_size: int = 5,
-                 stride_list=[1],
-                 padding_list=[1],
-                 hidden_list: List[int] = [32],
-                 block_list: List[int] = [8],
-                 in_bit: int = 32,
-                 w_bit: int = 32,
-                 mode: str = "usv",
-                 v_max: float = 10.8,
-                 v_pi: float = 4.36,
-                 act_thres: float = 6.0,
-                 photodetect: bool = True,
-                 bias: bool = False,
-                 device: Device = torch.device("cuda")
-                 ) -> None:
+    def __init__(
+        self,
+        img_height: int,
+        img_width: int,
+        in_channel: int,
+        n_class: int,
+        kernel_list: List[int] = [32],
+        kernel_size_list: List[int] = [3],
+        pool_out_size: int = 5,
+        stride_list=[1],
+        padding_list=[1],
+        hidden_list: List[int] = [32],
+        block_list: List[int] = [8],
+        in_bit: int = 32,
+        w_bit: int = 32,
+        mode: str = "usv",
+        v_max: float = 10.8,
+        v_pi: float = 4.36,
+        act_thres: float = 6.0,
+        photodetect: bool = True,
+        bias: bool = False,
+        device: Device = torch.device("cuda"),
+    ) -> None:
         super().__init__()
         self.img_height = img_height
         self.img_width = img_width
@@ -163,9 +161,8 @@ class SparseBP_MZI_CNN(SparseBP_Base):
     def build_layers(self):
         self.features = OrderedDict()
         for idx, out_channel in enumerate(self.kernel_list, 0):
-            layer_name = "conv" + str(idx+1)
-            in_channel = self.in_channel if(
-                idx == 0) else self.kernel_list[idx-1]
+            layer_name = "conv" + str(idx + 1)
+            in_channel = self.in_channel if (idx == 0) else self.kernel_list[idx - 1]
             self.features[layer_name] = ConvBlock(
                 in_channel,
                 out_channel,
@@ -181,29 +178,26 @@ class SparseBP_MZI_CNN(SparseBP_Base):
                 self.in_bit,
                 self.photodetect,
                 self.act_thres,
-                self.device
+                self.device,
             )
         self.features = nn.Sequential(self.features)
 
-        if(self.pool_out_size > 0):
+        if self.pool_out_size > 0:
             self.pool2d = nn.AdaptiveAvgPool2d(self.pool_out_size)
-            feature_size = self.kernel_list[-1] * \
-                self.pool_out_size * self.pool_out_size
+            feature_size = self.kernel_list[-1] * self.pool_out_size * self.pool_out_size
         else:
             self.pool2d = None
             img_height, img_width = self.img_height, self.img_width
             for layer in self.modules():
-                if(isinstance(layer, MZIBlockConv2d)):
-                    img_height, img_width = layer.get_output_dim(
-                        img_height, img_width)
+                if isinstance(layer, MZIBlockConv2d):
+                    img_height, img_width = layer.get_output_dim(img_height, img_width)
             feature_size = img_height * img_width * self.kernel_list[-1]
 
         self.classifier = OrderedDict()
         for idx, hidden_dim in enumerate(self.hidden_list, 0):
-            layer_name = "fc" + str(idx+1)
-            in_channel = feature_size if idx == 0 else self.hidden_list[idx-1]
+            layer_name = "fc" + str(idx + 1)
+            in_channel = feature_size if idx == 0 else self.hidden_list[idx - 1]
             out_channel = hidden_dim
-            # fc = nn.Linear(in_channel, out_channel, bias=False)
             self.classifier[layer_name] = LinearBlock(
                 in_channel,
                 out_channel,
@@ -217,10 +211,10 @@ class SparseBP_MZI_CNN(SparseBP_Base):
                 photodetect=self.photodetect,
                 activation=True,
                 act_thres=self.act_thres,
-                device=self.device
+                device=self.device,
             )
 
-        layer_name = "fc"+str(len(self.hidden_list)+1)
+        layer_name = "fc" + str(len(self.hidden_list) + 1)
         self.classifier[layer_name] = MZIBlockLinear(
             self.hidden_list[-1] if len(self.hidden_list) > 0 else feature_size,
             self.n_class,
@@ -232,14 +226,13 @@ class SparseBP_MZI_CNN(SparseBP_Base):
             in_bit=self.in_bit,
             w_bit=self.w_bit,
             photodetect=self.photodetect,
-            device=self.device
+            device=self.device,
         )
         self.classifier = nn.Sequential(self.classifier)
-        # self.layers.update(self.acts)
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.features(x)
-        if(self.pool2d is not None):
+        if self.pool2d is not None:
             x = self.pool2d(x)
         x = torch.flatten(x, 1)
         x = self.classifier(x)

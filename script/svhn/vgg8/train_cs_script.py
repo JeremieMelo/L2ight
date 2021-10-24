@@ -4,7 +4,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/vgg8/cs"
 script = 'train_learn.py'
@@ -38,14 +38,14 @@ if __name__ == '__main__':
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
     # fbs, ss, cs, first, input_norm, id
     tasks = [[0.6, 0, 0.5, 0, "none", 1]] # 17798  3:58 AM 4/25
-    tasks = [[0.6, 0, 0.4, 0, "none", 1]] # 20541  04:55 AM 4/25
-    tasks = [[0.6, 0, 0.6, 0, "none", 1]] # 20772  04:56 AM 4/25
-    tasks = [[0.6, 0.4, 0.4, 0, "none", 1]] # 20670  04:56 AM 4/25
-    tasks = [[0.6, 0.4, 0.4, 1, "none", 1]] # 1366  09:53 PM 4/25
-    tasks = [[0.6, 0, 0.6, 1, "none", 1]] # 2377  10:03 PM 4/25 w/o ss, first conv=1
-    tasks = [[0.6, 0, 0.6, 0, "exp", 1]] # 1684  02:23 AM 4/26 w/o ss, first conv=0, exp norm
-    # tasks = [[0.6, 0, 0.6, 0, "var"]] # 2377  10:03 PM 4/25 w/o ss, first conv=0, var norm
-    tasks = [[0.6, 0, 0.6, 0, "none", 2]] # 22880  05:26 PM 4/30
+    tasks = [[0.6, 0, 0.4, 0, "none", 1]] #
+    tasks = [[0.6, 0, 0.6, 0, "none", 1]] #
+    tasks = [[0.6, 0.4, 0.4, 0, "none", 1]] #
+    tasks = [[0.6, 0.4, 0.4, 1, "none", 1]] #
+    tasks = [[0.6, 0, 0.6, 1, "none", 1]] # w/o ss, first conv=1
+    tasks = [[0.6, 0, 0.6, 0, "exp", 1]] # w/o ss, first conv=0, exp norm
+    # w/o ss, first conv=0, var norm
+    tasks = [[0.6, 0, 0.6, 0, "none", 2]] #
     with Pool(1) as p:
         p.map(task_launcher, tasks)
     logger.info(f"Exp: {configs.run.experiment} Done.")

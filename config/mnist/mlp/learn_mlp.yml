@@ -64,7 +64,7 @@ checkpoint:
   checkpoint_dir: "mnist/mlp/learn"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/mnist/mlp/map/SparseBP_MZI_MLP_wb-8_ib-32_bprank-8_bpfb-0_bpin-0__acc-97.43_epoch-0.pt"
+  restore_checkpoint : ""
 
 model:
   name: "SparseBP_MZI_MLP"

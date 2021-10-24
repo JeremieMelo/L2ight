@@ -72,7 +72,7 @@ checkpoint:
   checkpoint_dir: "cifar10/resnet18/trans_pm"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/cifar100/resnet18/pretrain/SparseBP_MZI_ResNet18_wb-32_ib-32__acc-68.94_epoch-187.pt"
+  restore_checkpoint : ""
   no_linear: 0 ## remove linear layer
 
 model:

@@ -62,7 +62,7 @@ checkpoint:
   checkpoint_dir: "svhn/resnet18/pm"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/svhn/resnet18/pretrain/SparseBP_MZI_ResNet18_wb-32_ib-32__acc-93.88_epoch-180.pt"
+  restore_checkpoint : ""
 
 model:
   name: "SparseBP_MZI_ResNet18"

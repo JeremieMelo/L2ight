@@ -4,7 +4,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/vgg8/ds"
 script = 'train_learn.py'
@@ -39,11 +39,11 @@ if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
     # s = [0, 0.5, 0.6, 0.7]
-    # s = [0.5] # 5214  02:36 AM 04/26
+    #
     # ds id
-    s = [(0.4, 1)] # 8906  02:50 AM 04/26
-    s = [(0.5, 1)] # 11248  03:16 AM 04/26
-    s = [(0.5, 2)] # 23111  05:27 PM 04/30
+    s = [(0.4, 1)] #
+    s = [(0.5, 1)] #
+    s = [(0.5, 2)] #
     with Pool(1) as p:
         p.map(task_launcher, s)
     logger.info(f"Exp: {configs.run.experiment} Done.")

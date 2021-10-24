@@ -1,3 +1,10 @@
+'''
+Description:
+Author: Jiaqi Gu (jqgu@utexas.edu)
+Date: 2021-10-24 17:09:44
+LastEditors: Jiaqi Gu (jqgu@utexas.edu)
+LastEditTime: 2021-10-24 17:09:44
+'''
 
 import os
 import subprocess
@@ -5,7 +12,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/vgg8/pm"
 script = 'train_map.py'
@@ -37,8 +44,6 @@ def task_launcher(args):
 if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
-    tasks1 = [20,40,60,80]
-    tasks2 = [120,200]
     tasks3 = [300]
     with Pool(1) as p:
         p.map(task_launcher, tasks3)

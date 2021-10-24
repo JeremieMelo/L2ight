@@ -1,10 +1,17 @@
+'''
+Description:
+Author: Jiaqi Gu (jqgu@utexas.edu)
+Date: 2021-10-24 16:50:48
+LastEditors: Jiaqi Gu (jqgu@utexas.edu)
+LastEditTime: 2021-10-24 16:50:48
+'''
 import os
 import subprocess
 from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/vgg8/ss"
 script = 'train_learn.py'
@@ -35,10 +42,9 @@ if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
     #         fbs   fbs_norm ss
-    # tasks = [[0.6, "exp", 0.4]] # 16366  3:57 AM 4/25
-    # tasks = [[0, "exp", 0.6], [0, "exp", 0.8]] # 4251  08:17 PM 4/25 ## for RAD
-    tasks = [[0.6, "exp", 0.4]] # 26613  08:25 PM 4/25 # w/o first conv
-    # tasks = [[0.6, "exp", 0.6]] # 5292  08:24 PM 4/25 # w/o first conv
+    # ## for RAD
+    tasks = [[0.6, "exp", 0.4]] # # w/o first conv
+    # # w/o first conv
     with Pool(1) as p:
         p.map(task_launcher, tasks)
     logger.info(f"Exp: {configs.run.experiment} Done.")

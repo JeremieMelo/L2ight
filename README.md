@@ -1,7 +1,22 @@
-# L2ight: Enabling On-Chip Learning for Optical Neural Networks via Efficient in-situ Subspace Optimization
+# L2ight
 
+By [Jiaqi Gu](https://github.com/JeremieMelo), [Hanqing Zhu](https://github.com/zhuhanqing), [Chenghao Feng](https://github.com/Fengchenghao1996), [Zixuan Jiang](https://github.com/zixuanjiang), Ray T. Chen and David Z. Pan.
+
+This repo is the official implementation of "L2ight: Enabling On-Chip Learning for Optical Neural Networks via Efficient in-situ Subspace Optimization".
+
+# Introduction
+**L2ight** is a closed-loop ONN on-chip learning framework to enable scalable ONN mapping and efficient *in-situ* learning.
+**L2ight** adopts a three-stage learning flow that first calibrates the complicated photonic circuit states under challenging physical constraints, then performs photonic core mapping via combined analytical solving and zeroth-order optimization.
+A subspace learning procedure with multi-level sparsity is integrated into **L2ight** to enable *in-situ* gradient evaluation and fast adaptation, unleashing the power of optics for real on-chip intelligence.
+**L2ight** outperforms prior ONN training protocols with **3-order-of-magnitude** higher scalability and over **30X** better efficiency, when benchmarked on various models and learning tasks.
+This synergistic framework is the *first* scalable on-chip learning solution that pushes this emerging field from *intractable* to *scalable* and further to *efficient* for next-generation self-learnable photonic neural chips.
+
+![flow](figures/L2ightFlow.png)
+![teaser](figures/teaser.png)
 # Dependencies
 * Python >= 3.6
+* pyutils >= 0.0.1. See [pyutils](https://github.com/JeremieMelo/pyutility) for installation.
+* pytorch-onn >= 0.0.1. See [pytorch-onn](https://github.com/JeremieMelo/pytorch-onn) for installation.
 * Python libraries listed in `requirements.txt`
 * NVIDIA GPUs and CUDA >= 10.2
 
@@ -15,16 +30,9 @@
         * sparse_bp_base.py: base model definition; identity calibration and mapping codes.
     * optimizer/: mixedtrain and flops optimizers
     * builder.py: build training utilities
-* onnlib/: third party
-* pyutils/: third party to provide utility and CUDA-accelerated PTC simulation
 * script/: contains experiment scripts
 * train_pretrain.py, train_map.py, train_learn.py, train_zo_learn.py: training logic
 * compare_gradient.py: compare approximated gradients with true gradients for ablation
-
-# Installation
-* Need to install CUDA support for photonic tensor core acceleration, including MODULE=`hadamard_cuda`, `matrix_parametrization`, and `universal_cuda`\
-`> cd pyutils/cuda_extension/MODULE`\
-`> python3 setup.py install --user`
 
 # Usage
 * Pretrain model.\
@@ -44,3 +52,13 @@
 
 * Comparison with FLOPS [DAC 2020] and MixedTrn [AAAI 2021]. Run with the METHOD=`mixedtrain` or `flops`,\
 `> python3 train_zo_learn.py config/mnist/cnn3/METHOD/learn.yml`
+
+# Citing L2ight
+```
+@inproceedings{gu2021L2ight,
+  title={L2ight: Enabling On-Chip Learning for Optical Neural Networks via Efficient in-situ Subspace Optimization},
+  author={Jiaqi Gu and Hanqing Zhu and Chenghao Feng and Zixuan Jiang and Ray T. Chen and David Z. Pan},
+  journal={Conference on Neural Information Processing Systems (NeurIPS)},
+  year={2021}
+}
+```

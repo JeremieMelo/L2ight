@@ -1,6 +1,14 @@
+"""
+Description:
+Author: Jiaqi Gu (jqgu@utexas.edu)
+Date: 2021-10-24 16:29:09
+LastEditors: Jiaqi Gu (jqgu@utexas.edu)
+LastEditTime: 2021-10-24 16:29:10
+"""
 from torch import nn
 
 __all__ = ["ReLUN"]
+
 
 class ReLUN(nn.Hardtanh):
     r"""Applies the element-wise function:
@@ -26,9 +34,8 @@ class ReLUN(nn.Hardtanh):
     """
 
     def __init__(self, N, inplace=False):
-        super(ReLUN, self).__init__(0., N, inplace)
+        super(ReLUN, self).__init__(0.0, N, inplace)
 
     def extra_repr(self):
-        inplace_str = 'inplace' if self.inplace else ''
+        inplace_str = "inplace" if self.inplace else ""
         return inplace_str
-

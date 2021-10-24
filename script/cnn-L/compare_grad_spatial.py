@@ -5,7 +5,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/fmnist/cnn3/ss_cg"
 script = 'compare_gradient.py'
@@ -27,7 +27,7 @@ def task_launcher(s: float):
 
 
 if __name__ == '__main__':
-    # 3376  07:26 PM 04/24
+    #
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
     s = [0.2, 0.4, 0.6, 0.8, 0.9]

@@ -62,7 +62,7 @@ checkpoint:
   checkpoint_dir: "tinyimagenet/resnet18/pm"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/tinyimagenet/resnet18/pretrain/SparseBP_MZI_ResNet18_wb-32_ib-32__acc-50.41_epoch-64.pt"
+  restore_checkpoint : ""
 
 model:
   name: "SparseBP_MZI_ResNet18"

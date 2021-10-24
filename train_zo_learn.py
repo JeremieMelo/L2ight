@@ -10,11 +10,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 from core import builder
 from pyutils.general import logger as lg
-from pyutils.loss import distillation_loss
 from pyutils.torch_train import (BestKModelSaver, count_parameters,
                                  get_learning_rate, load_model,
                                  set_torch_deterministic)
@@ -161,8 +160,6 @@ def main() -> None:
             model.switch_mode_to("phase")
             model.sync_parameters(src="weight")
 
-        # assert model.mode == "usv", lg.error(
-        #     "Only support subspace learning in usv mode.")
             lg.info("Validate loaded ideal model without noise...")
             ### this is important, to call build_weight to construct non-ideal U and V
             validate(
@@ -202,7 +199,6 @@ def main() -> None:
                                   sign=int(configs.sparse.bp_rank_sign), random_state=None)
 
         lg.info("Validate loaded model with noise...")
-        ### this is important, to call build_weight to construct non-ideal U and V
         validate(
             model,
             validation_loader,
@@ -260,13 +256,6 @@ def main() -> None:
         report = model.get_learning_profiling(input_size=(configs.run.batch_size, configs.dataset.in_channel, configs.dataset.img_height, configs.dataset.img_width))
         lg.info(report)
         mlflow.log_dict(report, "profile.yaml")
-        '''
-        {'total': {'core_call': 211372800000.0, 'accum_step': 138489715.0}, 'breakdown': {'forward_core_call': 53254400000, 'forward_accum_step': 1784946, 'backward_weight_core_call': 106502400000.0, 'backward_weight_accum_step': 136434370.0, 'backward_input_core_call': 51616000000, 'backward_input_accum_step': 270399}}
-
-        {'total': {'core_call': 86019760960.0, 'accum_step': 25775031.75}, 'breakdown': {'forward_core_call': 53254400000, 'forward_accum_step': 1784946, 'backward_weight_core_call': 21357351488.0, 'backward_weight_accum_step': 23938489.75, 'backward_input_core_call': 11408009472.0, 'backward_input_accum_step': 51596}}
-
-        {'total': {'core_call': 17103619928.0, 'accum_step': 5123769.0}, 'breakdown': {'forward_core_call': 10548631552, 'forward_accum_step': 354020, 'backward_weight_core_call': 4295288536.0, 'backward_weight_accum_step': 4759515.0, 'backward_input_core_call': 2259699840.0, 'backward_input_accum_step': 10234}}
-        '''
     except KeyboardInterrupt:
         lg.warning("Ctrl-C Stopped")
 

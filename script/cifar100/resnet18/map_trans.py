@@ -5,7 +5,7 @@ from multiprocessing import Pool
 
 import mlflow
 from pyutils.general import ensure_dir, logger
-from torchpack.utils.config import configs
+from pyutils.config import configs
 
 root = "log/cifar10/resnet18/trans"
 script = 'train_map.py'
@@ -40,7 +40,7 @@ def task_launcher(args):
 if __name__ == '__main__':
     ensure_dir(root)
     mlflow.set_experiment(configs.run.experiment)  # set experiments first
-    tasks3 = [400] # 7485  12:33 AM 04/28 ZTP DONE
+    tasks3 = [400] # ZTP DONE
     with Pool(1) as p:
         p.map(task_launcher, tasks3)
     logger.info(f"Exp: {configs.run.experiment} Done.")

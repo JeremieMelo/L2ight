@@ -62,7 +62,7 @@ checkpoint:
   checkpoint_dir: "cifar100/vgg8/pm"
   model_comment: ""
   resume: 1
-  restore_checkpoint: "./checkpoint/cifar10/vgg8/pretrain/SparseBP_MZI_VGG8_wb-32_ib-32__acc-90.66_epoch-185.pt"
+  restore_checkpoint : ""
 
 model:
   name: "SparseBP_MZI_VGG8"

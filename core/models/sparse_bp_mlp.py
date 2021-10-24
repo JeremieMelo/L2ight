@@ -1,55 +1,24 @@
+'''
+Description:
+Author: Jiaqi Gu (jqgu@utexas.edu)
+Date: 2021-10-24 16:24:26
+LastEditors: Jiaqi Gu (jqgu@utexas.edu)
+LastEditTime: 2021-10-24 17:03:36
+'''
 from collections import OrderedDict
 from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
+from pyutils.general import logger
 from torch import Tensor, nn
 from torch.types import Device
-from torchpack.utils.logging import logger
 
 from .layers.activation import ReLUN
-from .layers.custom_linear import MZIBlockLinear, SparseBPLinear
+from .layers.custom_linear import MZIBlockLinear
 from .sparse_bp_base import SparseBP_Base
 
 __all__ = ["SparseBP_MZI_MLP"]
-
-
-class SparseBP_MLP(SparseBP_Base):
-    def __init__(self, n_feat, n_class, device=torch.device("cuda")) -> None:
-        super().__init__()
-        self.n_feat = n_feat
-        self.n_class = n_class
-        self.device = device
-        self.fc1 = SparseBPLinear(
-            n_feat, 64, bias=False, miniblock=8, device=device)
-        self.fc2 = SparseBPLinear(
-            64, 64, bias=False, miniblock=8, device=device)
-        self.fc3 = SparseBPLinear(
-            64, 10, bias=False, miniblock=8, device=device)
-        self.layers = {"fc1": self.fc1, "fc2": self.fc2, "fc3": self.fc3}
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        for layer in self.layers.values():
-            layer.reset_parameters()
-
-    def gen_bp_mask(self, bp_sparsity=None):
-        for layer in self.layers.values():
-            layer.gen_deterministic_gradient_mask(bp_sparsity)
-
-    def set_bp_rank(self, bp_rank):
-        for layer in self.layers.values():
-            layer.set_bp_rank(bp_rank)
-
-    def forward(self, x):
-        x = x.view(x.size(0), -1)
-        n_layer = len(self.layers)
-        for i, layer in enumerate(self.layers.values()):
-            x = layer(x)
-            if(i < n_layer - 1):
-                x = torch.relu(x)
-
-        return x
 
 
 class LinearBlock(nn.Module):
@@ -67,51 +36,41 @@ class LinearBlock(nn.Module):
         photodetect: bool = False,
         activation: bool = True,
         act_thres: int = 6,
-        device: Device = torch.device("cuda")
+        device: Device = torch.device("cuda"),
     ) -> None:
         super().__init__()
         self.linear = MZIBlockLinear(
-            in_channel,
-            out_channel,
-            miniblock,
-            bias,
-            mode,
-            v_max,
-            v_pi,
-            w_bit,
-            in_bit,
-            photodetect,
-            device)
+            in_channel, out_channel, miniblock, bias, mode, v_max, v_pi, w_bit, in_bit, photodetect, device
+        )
 
-        self.activation = ReLUN(
-            act_thres, inplace=True) if activation else None
+        self.activation = ReLUN(act_thres, inplace=True) if activation else None
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.linear(x)
-        if(self.activation is not None):
+        if self.activation is not None:
             x = self.activation(x)
         return x
 
 
-class SparseBP_MZI_MLP(torch.nn.Module):
-    '''MZI MLP (Shen+, Nature Photonics 2017). Support sparse backpropagation. Blocking matrix multiplication.
-    '''
+class SparseBP_MZI_MLP(SparseBP_Base):
+    """MZI MLP (Shen+, Nature Photonics 2017). Support sparse backpropagation. Blocking matrix multiplication."""
 
-    def __init__(self,
-                 n_feat: int,
-                 n_class: int,
-                 hidden_list: List[int] = [32],
-                 block_list: List[int] = [8],
-                 in_bit: int = 32,
-                 w_bit: int = 32,
-                 mode: str = "usv",
-                 v_max: float = 10.8,
-                 v_pi: float = 4.36,
-                 act_thres: float = 6.0,
-                 photodetect: bool = True,
-                 bias: bool = False,
-                 device: Device = torch.device("cuda")
-                 ) -> None:
+    def __init__(
+        self,
+        n_feat: int,
+        n_class: int,
+        hidden_list: List[int] = [32],
+        block_list: List[int] = [8],
+        in_bit: int = 32,
+        w_bit: int = 32,
+        mode: str = "usv",
+        v_max: float = 10.8,
+        v_pi: float = 4.36,
+        act_thres: float = 6.0,
+        photodetect: bool = True,
+        bias: bool = False,
+        device: Device = torch.device("cuda"),
+    ) -> None:
         super().__init__()
         self.n_feat = n_feat
         self.n_class = n_class
@@ -140,8 +99,8 @@ class SparseBP_MZI_MLP(torch.nn.Module):
         self.classifier = OrderedDict()
 
         for idx, hidden_dim in enumerate(self.hidden_list, 0):
-            layer_name = "fc" + str(idx+1)
-            in_channel = self.n_feat if idx == 0 else self.hidden_list[idx-1]
+            layer_name = "fc" + str(idx + 1)
+            in_channel = self.n_feat if idx == 0 else self.hidden_list[idx - 1]
             out_channel = hidden_dim
             self.classifier[layer_name] = LinearBlock(
                 in_channel,
@@ -156,10 +115,10 @@ class SparseBP_MZI_MLP(torch.nn.Module):
                 photodetect=self.photodetect,
                 activation=True,
                 act_thres=self.act_thres,
-                device=self.device
+                device=self.device,
             )
 
-        layer_name = "fc"+str(len(self.hidden_list)+1)
+        layer_name = "fc" + str(len(self.hidden_list) + 1)
         self.classifier[layer_name] = MZIBlockLinear(
             self.hidden_list[-1] if len(self.hidden_list) > 0 else self.n_feat,
             self.n_class,
@@ -171,7 +130,7 @@ class SparseBP_MZI_MLP(torch.nn.Module):
             in_bit=self.in_bit,
             w_bit=self.w_bit,
             photodetect=self.photodetect,
-            device=self.device
+            device=self.device,
         )
         self.classifier = nn.Sequential(self.classifier)
 
