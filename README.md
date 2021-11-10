@@ -58,7 +58,7 @@ This synergistic framework is the *first* scalable on-chip learning solution tha
 @inproceedings{gu2021L2ight,
   title={L2ight: Enabling On-Chip Learning for Optical Neural Networks via Efficient in-situ Subspace Optimization},
   author={Jiaqi Gu and Hanqing Zhu and Chenghao Feng and Zixuan Jiang and Ray T. Chen and David Z. Pan},
-  journal={Conference on Neural Information Processing Systems (NeurIPS)},
+  booktitle={Conference on Neural Information Processing Systems (NeurIPS)},
   year={2021}
 }
 ```
