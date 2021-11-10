@@ -2,7 +2,7 @@
 
 By [Jiaqi Gu](https://github.com/JeremieMelo), [Hanqing Zhu](https://github.com/zhuhanqing), [Chenghao Feng](https://github.com/Fengchenghao1996), [Zixuan Jiang](https://github.com/zixuanjiang), Ray T. Chen and David Z. Pan.
 
-This repo is the official implementation of "L2ight: Enabling On-Chip Learning for Optical Neural Networks via Efficient in-situ Subspace Optimization".
+This repo is the official implementation of "[L2ight: Enabling On-Chip Learning for Optical Neural Networks via Efficient in-situ Subspace Optimization](https://arxiv.org/abs/2110.14807)".
 
 # Introduction
 **L2ight** is a closed-loop ONN on-chip learning framework to enable scalable ONN mapping and efficient *in-situ* learning.
